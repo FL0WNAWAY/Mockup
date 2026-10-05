@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Garment Mockup</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --paper:#EEF2EE; --panel:#FFFFFF; --ink:#16302B; --soft:#587068; --line:#CFD9D3;
+  --mat:#1E5B4C; --mat-line:#2F7361; --chalk:#F4F1E4; --pin:#C93A68; --pin-ink:#FFFFFF; --tape:#F0C445;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#0F1F1B; --panel:#172B26; --ink:#E6EEE9; --soft:#9DB3AA; --line:#2C453D;
+    --mat:#17483C; --mat-line:#235C4D; --pin:#EE6E97; --pin-ink:#1B0A10;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0F1F1B; --panel:#172B26; --ink:#E6EEE9; --soft:#9DB3AA; --line:#2C453D;
+  --mat:#17483C; --mat-line:#235C4D; --pin:#EE6E97; --pin-ink:#1B0A10;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font:400 16px/1.45 "Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+h1{font:700 1.5rem/1.1 "Bricolage Grotesque","Instrument Sans",system-ui,sans-serif;margin:0;letter-spacing:-.01em}
+.app{display:grid;gap:0;max-width:1180px;margin:0 auto}
+.stage{background-color:var(--mat);
+  background-image:linear-gradient(var(--mat-line) 1px,transparent 1px),linear-gradient(90deg,var(--mat-line) 1px,transparent 1px);
+  background-size:24px 24px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:12px}
+.stage header{width:100%;display:flex;justify-content:space-between;align-items:center;color:var(--chalk)}
+#cv{display:block;height:min(62vh,720px);max-width:100%;aspect-ratio:2/3;height:auto;width:min(100%,calc(62vh*2/3));
+  background:#fff;border-radius:3px;box-shadow:0 10px 24px rgba(0,0,0,.35);cursor:grab}
+#cv.drag{touch-action:none}
+.panel{background:var(--panel);padding:16px;display:flex;flex-direction:column;gap:16px;min-width:0}
+@media (min-width:880px){
+  .app{grid-template-columns:1fr 390px;min-height:100vh}
+  .stage{padding:24px;justify-content:flex-start}
+  #cv{width:min(100%,calc((100vh - 120px)*2/3))}
+  .panel{border-left:1px solid var(--line);padding:24px}
+}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:2px solid var(--line)}
+.tabs button{appearance:none;background:none;border:0;color:var(--soft);font:600 1rem/1 "Bricolage Grotesque",sans-serif;
+  padding:12px 4px;margin-bottom:-2px;border-bottom:2px solid transparent;cursor:pointer}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--pin)}
+.pane{display:none;flex-direction:column;gap:16px}
+.pane.on{display:flex}
+[hidden]{display:none!important}
+.hint{margin:0;color:var(--soft);font-size:.9rem;max-width:44ch}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;border-radius:8px;
+  border:1.5px solid var(--ink);background:transparent;color:var(--ink);font:600 .95rem/1 inherit;font-family:inherit;cursor:pointer}
+.btn.main{background:var(--pin);border-color:var(--pin);color:var(--pin-ink)}
+.btn.quiet{border-color:var(--line);font-weight:500}
+.btn{position:relative;overflow:hidden}
+.btn input[type=file]{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:100px}
+.btn:focus-within,.btn:focus-visible,.tabs button:focus-visible,.sw:focus-visible,.seg label:focus-within{outline:3px solid var(--tape);outline-offset:2px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.field{display:grid;gap:6px}
+.field>span,.field>legend{font-weight:600;font-size:.9rem;padding:0}
+fieldset.field{border:0;margin:0;padding:0}
+input[type=range]{width:100%;accent-color:var(--pin);height:28px;margin:0}
+input[type=color]{width:44px;height:36px;padding:0;border:1.5px solid var(--line);border-radius:6px;background:none}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;border:1.5px solid var(--line);border-radius:8px;overflow:hidden}
+.seg label{position:relative;text-align:center;padding:10px 4px;font-size:.88rem;cursor:pointer;border-left:1px solid var(--line)}
+.seg label:first-child{border-left:0}
+.seg input{position:absolute;opacity:0}
+.seg label:has(input:checked){background:var(--ink);color:var(--panel);font-weight:600}
+.tray{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 8px}
+.sw{flex:none;width:60px;height:60px;padding:0;border-radius:50%;border:3px solid var(--panel);outline:1.5px solid var(--line);overflow:hidden;cursor:pointer;background:none}
+.sw.pc{width:44px;height:44px}
+.sw canvas{width:100%;height:100%;display:block}
+.sw[aria-pressed="true"]{outline:3px solid var(--pin)}
+.check{display:flex;gap:10px;align-items:center;font-size:.95rem}
+.check input{width:20px;height:20px;accent-color:var(--pin)}
+.credit{margin:4px 0 0;font-size:.85rem;color:var(--chalk);opacity:.85}
+.credit a{color:var(--chalk);font-weight:600}
+#msg{min-height:1.4em;margin:0;font-size:.9rem;color:var(--soft)}
+#over{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;z-index:9;color:#fff;text-align:center}
+#over.on{display:flex}
+#over img{max-width:100%;max-height:70vh;border-radius:4px}
+</style>
+</head>
+<body>
+<div class="app">
+  <section class="stage">
+    <header><div><h1>Garment Mockup</h1>
+      <p class="credit">Created by Emma · <a href="https://www.instagram.com/seamcerely/" target="_blank" rel="noopener">Instagram</a></p></div>
+      <button class="btn main" id="save">Save picture</button></header>
+    <canvas id="cv" width="1200" height="1800" aria-label="Preview of you wearing the dress"></canvas>
+  </section>
+
+  <section class="panel">
+    <div class="tabs" role="tablist">
+      <button role="tab" data-tab="photo" aria-selected="true">Your photo</button>
+      <button role="tab" data-tab="dress" aria-selected="false">Garment</button>
+      <button role="tab" data-tab="fabric" aria-selected="false">Fabric</button>
+    </div>
+
+    <div class="pane on" id="p-photo">
+      <div class="row">
+        <label class="btn main">Choose a photo<input type="file" id="photoFile" accept="image/*"></label>
+        <button class="btn quiet" id="photoClear" hidden>Remove photo</button>
+      </div>
+      <p class="hint">Drag the photo on the sheet until your face sits in the pink oval. Pinch or use the slider to resize. Everything outside the white outline is cut away. A front-on photo against a plain wall works best.</p>
+      <label class="field"><span>Photo size</span><input type="range" data-k="pw" min="60" max="1400" step="1"></label>
+      <label class="field"><span>Tilt</span><input type="range" data-k="prot" min="-30" max="30" step="0.5"></label>
+      <div class="two">
+        <label class="field"><span>Head width</span><input type="range" data-k="hw" min="34" max="110" step="1"></label>
+        <label class="field"><span>Head height</span><input type="range" data-k="hh" min="46" max="120" step="1"></label>
+        <label class="field"><span>Neck width</span><input type="range" data-k="nw" min="12" max="44" step="1"></label>
+        <label class="field"><span>Soft edge</span><input type="range" data-k="feather" min="0" max="24" step="1"></label>
+      </div>
+      <div class="row">
+        <label class="row"><input type="color" data-k="skin"><span>Body skin tone</span></label>
+        <button class="btn quiet" data-pick="skin">Pick from photo</button>
+      </div>
+      <div class="row">
+        <label class="row"><input type="color" data-k="bg"><span>Backdrop colour</span></label>
+        <button class="btn quiet" data-pick="bg">Pick from photo</button>
+      </div>
+      <div class="row">
+        <button class="btn" id="defSave">Set as my default</button>
+        <button class="btn quiet" id="defClear" hidden>Forget default</button>
+      </div>
+    </div>
+
+    <div class="pane" id="p-dress">
+      <fieldset class="field"><legend>Garment</legend><div class="seg" data-seg="garment" data-o="dress:Dress,shirt:Collared shirt and pants"></div></fieldset>
+      <fieldset class="field" data-for="dress"><legend>Silhouette</legend><div class="seg" data-seg="sil" data-o="sheath:Sheath,aline:A-line,flare:Fit and flare,shift:Shift"></div></fieldset>
+      <fieldset class="field" data-for="dress"><legend>Neckline</legend><div class="seg" data-seg="neck" data-o="round:Round,v:V-neck,square:Square,boat:Boat"></div></fieldset>
+      <fieldset class="field"><legend>Sleeves</legend><div class="seg" data-seg="sleeve" data-o="none:None,cap:Cap,short:Short,long:Long"></div></fieldset>
+      <label class="field" data-for="dress"><span>Length: <output id="lenOut"></output></span><input type="range" data-k="hem" min="450" max="780" step="1"></label>
+      <fieldset class="field" data-for="shirt"><legend>Pants colour</legend>
+        <div class="row" id="pantsRow">
+          <button type="button" class="sw pc" data-c="#16161a" style="background:#16161a" aria-label="Black"></button>
+          <button type="button" class="sw pc" data-c="#f3eee0" style="background:#f3eee0" aria-label="Ivory"></button>
+          <button type="button" class="sw pc" id="pcCustom" hidden aria-label="Your last custom colour"></button>
+          <label class="btn quiet">Custom colour<input type="color" id="pantsPick" style="position:absolute;inset:0;width:100%;height:100%;opacity:0"></label>
+        </div></fieldset>
+      <label class="check"><input type="checkbox" data-k="shade">Show folds and shading</label>
+    </div>
+
+    <div class="pane" id="p-fabric">
+      <div class="row"><label class="btn main">Add fabric images<input type="file" id="fabFile" accept="image/*" multiple></label></div>
+      <div class="tray" id="tray"></div>
+      <p class="hint">Tap a swatch to try it. Drag on the sheet to slide the print around; pinch to resize it.</p>
+      <fieldset class="field"><legend>Layout</legend><div class="seg" data-seg="layout" data-o="repeat:Repeat as tiles,single:One large image"></div></fieldset>
+      <label class="check"><input type="checkbox" data-k="mirror">Mirror tiles to hide seams</label>
+      <label class="field"><span>Print size</span><input type="range" data-k="fsize" min="8" max="500" step="1"></label>
+      <label class="field"><span>Rotate print</span><input type="range" data-k="frot" min="-180" max="180" step="1"></label>
+      <div class="row"><button class="btn quiet" id="fabReset">Reset print position</button></div>
+    </div>
+    <p id="msg" role="status"></p>
+  </section>
+</div>
+
+<div id="over"><img alt="Your dress mock-up"><div>Press and hold the picture to save it.</div><button class="btn" style="color:#fff;border-color:#fff" id="overClose">Close</button></div>
+
+<script>
+(()=>{
+const W=600,H=900,SC=2,$=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const cv=$('#cv'),ctx=cv.getContext('2d');
+const off=document.createElement('canvas');off.width=W*SC;off.height=H*SC;const octx=off.getContext('2d',{willReadFrequently:true});
+const S={photo:null,px:300,py:110,pw:260,prot:0,hw:58,hh:70,nw:25,feather:8,skin:'#d9a98a',bg:'#ebe8e1',
+  garment:'dress',pants:'#16161a',custom:null,sil:'aline',neck:'round',sleeve:'none',hem:535,shade:true,
+  layout:'repeat',mirror:false,fsize:100,frot:0,fx:0,fy:0,sw:null};
+let tab='photo',swatches=[],queued=false;
+const say=t=>{$('#msg').textContent=t||''};
+const draw=()=>{if(!queued){queued=true;requestAnimationFrame(()=>{queued=false;render(false)})}};
+
+/* ---------- geometry ---------- */
+function halves(fn){for(const s of[1,-1])fn(d=>300+s*d,s)}
+function poly(p,a){p.moveTo(a[0],a[1]);for(let i=2;i<a.length;i+=2)p.lineTo(a[i],a[i+1]);p.closePath()}
+function geom(){
+  const shirt=S.garment==='shirt',hem=shirt?410:S.hem,sl=S.sleeve!=='none',nk=S.neck;
+  const slope=d=>169+(d-24)*10/46;
+  const nw=nk==='boat'?46:30,ny=slope(nw),spx=sl?66:56,spy=slope(spx);
+  const cy={round:200,v:232,square:208,boat:182}[nk];
+  let waistW,hemW;const sag={sheath:4,shift:5,aline:8,flare:20}[S.sil];
+  if(S.sil==='sheath'){waistW=54;hemW=67-(hem-389)*.03}
+  else if(S.sil==='shift'){waistW=66;hemW=72+(hem-400)*.05}
+  else if(S.sil==='aline'){waistW=55;hemW=Math.min(68+(hem-389)*.13,125)}
+  else{waistW=53;hemW=Math.min(53+(hem-297)*.6,262)}
+  if(shirt){waistW=60;hemW=71}
+  const trace=(p,X,closed)=>{
+    const arm=()=>{p.lineTo(X(spx),spy);if(sl)p.lineTo(X(64),236);else p.bezierCurveTo(X(52),195,X(52),220,X(64),236)};
+    if(shirt){
+      p.moveTo(X(closed?-1:0),190);p.lineTo(X(24),162);arm();
+      p.bezierCurveTo(X(66),270,X(60),285,X(60),305);p.bezierCurveTo(X(62),350,X(70),370,X(71),398);
+      p.bezierCurveTo(X(66),420,X(32),426,X(closed?-1:0),426);if(closed)p.closePath();return}
+    p.moveTo(X(closed?-1:0),cy);
+    if(nk==='round')p.bezierCurveTo(X(20),cy,X(nw),192,X(nw),ny);
+    else if(nk==='v')p.lineTo(X(nw),ny);
+    else if(nk==='square'){p.lineTo(X(nw-3),cy);p.lineTo(X(nw),ny)}
+    else p.quadraticCurveTo(X(26),cy+1,X(nw),ny);
+    arm();
+    if(S.sil==='sheath'){p.bezierCurveTo(X(64),262,X(54),278,X(54),297);p.bezierCurveTo(X(55),330,X(66),352,X(67),389);p.lineTo(X(hemW),hem)}
+    else if(S.sil==='shift')p.bezierCurveTo(X(66),280,X(68),370,X(hemW),hem);
+    else if(S.sil==='aline'){p.bezierCurveTo(X(64),262,X(55),278,X(55),297);p.bezierCurveTo(X(56),330,X(67),352,X(68),389);p.quadraticCurveTo(X(68+(hemW-68)*.45),(389+hem)/2,X(hemW),hem)}
+    else{p.bezierCurveTo(X(64),262,X(53),278,X(53),297);p.bezierCurveTo(X(100),317,X(hemW-12),hem-90,X(hemW),hem)}
+    p.quadraticCurveTo(X(hemW*.4),hem+sag,X(closed?-1:0),hem+sag);
+    if(closed)p.closePath();
+  };
+  const dress=new Path2D(),outline=new Path2D();
+  halves(X=>{trace(dress,X,true);trace(outline,X,false)});
+  let sleeves=null;
+  if(sl){const p=sleeves=new Path2D(),t=S.sleeve;
+    p.moveTo(348,175);p.bezierCurveTo(368,171,385,182,386,202);
+    if(t==='cap'){p.lineTo(387,222);p.lineTo(362,238)}
+    else if(t==='short'){p.lineTo(392,262);p.lineTo(359,268);p.lineTo(362,236)}
+    else{p.lineTo(395,300);p.lineTo(396,374);p.lineTo(367,376);p.lineTo(360,300);p.lineTo(362,236)}
+    p.closePath();
+    p.moveTo(252,175);p.bezierCurveTo(232,171,215,182,214,202);
+    if(t==='cap'){p.lineTo(211,222);p.lineTo(238,238)}
+    else if(t==='short'){p.lineTo(199,262);p.lineTo(231,272);p.lineTo(238,236)}
+    else{p.lineTo(181,326);p.quadraticCurveTo(174,345,189,352);p.lineTo(219,389);p.lineTo(239,362);p.lineTo(216,314);p.lineTo(238,236)}
+    p.closePath()}
+  let col=null;
+  if(shirt){col=new Path2D();halves(X=>{col.moveTo(X(21),155);col.lineTo(X(1),192);col.lineTo(X(27),207);col.lineTo(X(38),170);col.quadraticCurveTo(X(31),158,X(21),155);col.closePath()})}
+  return{dress,outline,sleeves,waistW,hemW,hem,sag,shirt,collar:col};
+}
+function maskPath(){
+  const p=new Path2D(),cy=150-S.hh*.85;
+  p.ellipse(300,cy,S.hw,S.hh,0,0,Math.PI*2);
+  p.rect(300-S.nw,cy,S.nw*2,174-cy);
+  return p;
+}
+
+/* ---------- figure ---------- */
+function skinFill(c,p,x0,x1){
+  c.fillStyle=S.skin;c.fill(p);c.save();c.clip(p);
+  const g=c.createLinearGradient(x0,0,x1,0);
+  g.addColorStop(0,'rgba(60,20,10,.18)');g.addColorStop(.3,'rgba(255,255,255,.05)');g.addColorStop(.7,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(60,20,10,.2)');
+  c.fillStyle=g;c.fillRect(0,0,W,H);c.restore();
+  c.strokeStyle='rgba(60,20,10,.14)';c.lineWidth=1;c.stroke(p);
+}
+function body(c){
+  let p=new Path2D(); /* back leg */
+  p.moveTo(300,420);p.lineTo(365,395);p.bezierCurveTo(366,480,342,560,336,620);p.bezierCurveTo(340,660,326,700,322,727);
+  p.lineTo(350,752);p.quadraticCurveTo(353,765,338,764);p.lineTo(306,748);p.lineTo(308,727);
+  p.bezierCurveTo(300,690,296,650,298,620);p.bezierCurveTo(296,560,296,480,296,430);p.closePath();
+  skinFill(c,p,296,366);
+  p=new Path2D(); /* front leg, crossing in */
+  p.moveTo(304,425);p.lineTo(235,395);p.bezierCurveTo(233,480,262,560,271,620);p.bezierCurveTo(266,665,282,700,285,727);
+  p.bezierCurveTo(280,760,274,790,280,808);p.quadraticCurveTo(296,823,314,808);p.bezierCurveTo(318,785,310,755,307,727);
+  p.bezierCurveTo(314,690,318,655,313,620);p.bezierCurveTo(316,560,310,480,304,425);p.closePath();
+  skinFill(c,p,236,318);
+  c.strokeStyle='rgba(60,20,10,.16)';c.lineWidth=1.5;c.lineCap='round';
+  c.beginPath();c.moveTo(280,612);c.quadraticCurveTo(292,620,305,612);c.stroke();
+  halves((X,s)=>{
+    const t=new Path2D();
+    t.moveTo(X(-1),130);t.lineTo(X(22),130);t.lineTo(X(23),158);
+    t.bezierCurveTo(X(27),171,X(50),171,X(70),180);t.lineTo(X(62),232);
+    t.bezierCurveTo(X(62),262,X(51),275,X(52),297);t.bezierCurveTo(X(53),330,X(64),355,X(65),389);
+    t.lineTo(X(62),440);t.lineTo(X(-1),440);t.closePath();
+    c.fillStyle=S.skin;c.fill(t);c.save();c.clip(t);
+    const g=c.createLinearGradient(X(0),0,X(66),0);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.7,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(60,20,10,.2)');
+    c.fillStyle=g;c.fillRect(0,0,W,H);c.restore();
+    c.strokeStyle='rgba(60,20,10,.18)';c.lineWidth=1.5;
+    c.beginPath();c.moveTo(X(8),185);c.quadraticCurveTo(X(26),180,X(46),178);c.stroke();
+  });
+}
+function arms(c){
+  let p=new Path2D(); /* hanging arm */
+  p.moveTo(352,176);p.bezierCurveTo(370,174,382,184,382,202);p.bezierCurveTo(384,240,388,270,390,300);
+  p.bezierCurveTo(394,330,393,355,391,374);p.bezierCurveTo(397,390,395,408,389,419);p.quadraticCurveTo(381,426,377,415);
+  p.bezierCurveTo(374,402,372,393,370,385);p.lineTo(371,372);p.bezierCurveTo(368,345,366,320,364,300);
+  p.bezierCurveTo(362,270,362,250,362,232);p.closePath();
+  skinFill(c,p,360,396);
+  p=new Path2D(); /* hand-on-hip arm */
+  p.moveTo(248,176);p.bezierCurveTo(230,174,218,184,218,202);p.bezierCurveTo(210,250,194,295,186,326);
+  p.quadraticCurveTo(181,341,192,347);p.lineTo(222,384);p.bezierCurveTo(232,399,251,403,257,392);
+  p.quadraticCurveTo(259,380,246,374);p.lineTo(235,362);p.lineTo(212,318);p.bezierCurveTo(222,285,232,255,238,232);p.closePath();
+  skinFill(c,p,184,258);
+}
+function pants(c){
+  const leg=(build,x0,x1,cr)=>{const p=new Path2D();build(p);
+    c.fillStyle=S.pants;c.fill(p);c.save();c.clip(p);
+    const g=c.createLinearGradient(x0,0,x1,0);
+    g.addColorStop(0,'rgba(0,0,0,.25)');g.addColorStop(.35,'rgba(255,255,255,.07)');g.addColorStop(.75,'rgba(0,0,0,.04)');g.addColorStop(1,'rgba(0,0,0,.3)');
+    c.fillStyle=g;c.fillRect(0,0,W,H);c.restore();
+    c.strokeStyle='rgba(255,255,255,.14)';c.lineWidth=1;c.beginPath();c.moveTo(cr[0],cr[1]);c.lineTo(cr[2],cr[3]);c.stroke();
+    c.strokeStyle='rgba(0,0,0,.35)';c.stroke(p)};
+  leg(p=>{p.moveTo(296,300);p.lineTo(354,300);p.bezierCurveTo(355,330,366,352,367,389);
+    p.bezierCurveTo(369,470,352,560,347,737);p.lineTo(290,737);p.lineTo(292,430);p.closePath()},290,369,[336,440,322,737]);
+  leg(p=>{p.moveTo(304,300);p.lineTo(246,300);p.bezierCurveTo(245,330,234,352,233,389);
+    p.bezierCurveTo(230,470,254,560,263,737);p.lineTo(321,737);p.bezierCurveTo(325,640,318,520,308,430);p.closePath()},231,323,[268,440,292,737]);
+}
+function shirtTrim(c,g){
+  c.save();c.clip(g.dress);c.strokeStyle='rgba(0,0,0,.28)';c.lineWidth=1;
+  for(const x of[293,307]){c.beginPath();c.moveTo(x,184);c.lineTo(x,440);c.stroke()}
+  for(let y=210;y<418;y+=36){c.fillStyle='rgba(255,255,255,.9)';c.beginPath();c.arc(300,y,3,0,7);c.fill();c.stroke()}
+  c.restore();
+}
+function collar(c,g){
+  c.save();c.clip(g.collar);fillFabric(c);c.fillStyle='rgba(255,255,255,.1)';c.fillRect(0,0,W,H);c.restore();
+  c.strokeStyle='rgba(0,0,0,.4)';c.lineWidth=1.2;c.lineJoin='round';c.stroke(g.collar);
+}
+
+/* ---------- fabric ---------- */
+function fillFabric(c){
+  const sw=S.sw;c.save();
+  if(!sw){c.fillStyle='#bbb';c.fillRect(0,0,W,H);c.restore();return}
+  const pct=S.fsize/100,rot=S.frot;
+  if(S.layout==='repeat'){
+    const k=150*pct/sw.cv.width,p=c.createPattern(S.mirror?sw.mir:sw.cv,'repeat');
+    p.setTransform(new DOMMatrix().translate(300+S.fx,400+S.fy).rotate(rot).scale(k));
+    c.fillStyle=p;c.fillRect(0,0,W,H);
+  }else{
+    c.fillStyle='#d8d8d8';c.fillRect(0,0,W,H);
+    const bot=S.garment==='shirt'?426:S.hem,k=Math.max(460/sw.cv.width,(bot-160)/sw.cv.height)*pct;
+    c.translate(300+S.fx,(180+bot)/2+S.fy);c.rotate(rot*Math.PI/180);c.scale(k,k);
+    c.drawImage(sw.cv,-sw.cv.width/2,-sw.cv.height/2);
+  }
+  c.restore();
+}
+function shade(c,g){
+  c.save();c.clip(g.dress);
+  const band=(y0,y1,hw)=>{const gr=c.createLinearGradient(300-hw,0,300+hw,0);
+    gr.addColorStop(0,'rgba(0,0,0,.36)');gr.addColorStop(.2,'rgba(0,0,0,.08)');gr.addColorStop(.45,'rgba(255,255,255,.06)');
+    gr.addColorStop(.8,'rgba(0,0,0,.1)');gr.addColorStop(1,'rgba(0,0,0,.4)');c.fillStyle=gr;c.fillRect(0,y0,W,y1-y0)};
+  const flared=!g.shirt&&(S.sil==='aline'||S.sil==='flare');
+  band(0,297,66);band(297,H,flared?g.hemW:Math.max(66,g.hemW));
+  halves(X=>{let r=c.createRadialGradient(X(28),226,2,X(28),226,26);r.addColorStop(0,'rgba(255,255,255,.13)');r.addColorStop(1,'rgba(255,255,255,0)');c.fillStyle=r;c.fillRect(X(28)-28,196,56,62);
+    r=c.createRadialGradient(X(28),256,2,X(28),256,22);r.addColorStop(0,'rgba(0,0,0,.14)');r.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=r;c.fillRect(X(28)-24,232,48,48)});
+  if(flared){
+    const n=S.sil==='flare'?7:3,hw=g.hemW,fw=hw/n*1.1,by=g.hem+40;
+    for(let i=0;i<n;i++){const t=(i+.5)/n*2-1,tx=300+t*g.waistW*.8,bx=300+t*hw*.92;
+      for(const[dx,col]of[[0,'rgba(0,0,0,.17)'],[fw*.55,'rgba(255,255,255,.1)']]){
+        const x=bx+dx,gr=c.createLinearGradient(x-fw/2,0,x+fw/2,0);
+        gr.addColorStop(0,'rgba(0,0,0,0)');gr.addColorStop(.5,col);gr.addColorStop(1,'rgba(0,0,0,0)');
+        c.fillStyle=gr;c.beginPath();c.moveTo(tx,303);c.lineTo(x-fw/2,by);c.lineTo(x+fw/2,by);c.closePath();c.fill()}}
+    if(S.sil==='flare'&&flared){c.strokeStyle='rgba(0,0,0,.28)';c.lineWidth=1.5;c.beginPath();c.moveTo(300-g.waistW,297);c.quadraticCurveTo(300,302,300+g.waistW,297);c.stroke()}
+  }
+  c.restore();
+}
+
+/* ---------- head ---------- */
+function drawHead(c){
+  const o=octx,m=maskPath();
+  o.setTransform(1,0,0,1,0,0);o.globalCompositeOperation='source-over';o.clearRect(0,0,off.width,off.height);
+  o.setTransform(SC,0,0,SC,0,0);o.globalCompositeOperation='lighter';o.fillStyle='#fff';o.fill(m);
+  const f=S.feather,n=10;
+  if(f>0){o.lineJoin='round';o.strokeStyle='rgba(255,255,255,'+1/n+')';for(let i=1;i<=n;i++){o.lineWidth=2*f*i/n;o.stroke(m)}}
+  o.globalCompositeOperation='source-in';
+  const k=S.pw/S.photo.width;
+  o.translate(S.px,S.py);o.rotate(S.prot*Math.PI/180);o.scale(k,k);o.drawImage(S.photo,-S.photo.width/2,-S.photo.height/2);
+  c.save();c.setTransform(1,0,0,1,0,0);c.drawImage(off,0,0);c.restore();
+}
+function guides(c){
+  const m=maskPath();c.save();c.setLineDash([7,6]);
+  c.lineWidth=3;c.strokeStyle='rgba(0,0,0,.45)';c.stroke(m);
+  c.lineWidth=1.5;c.strokeStyle='#fff';c.stroke(m);
+  c.strokeStyle='#E2557F';c.lineWidth=2;c.beginPath();c.ellipse(300,96,40,52,0,0,Math.PI*2);c.stroke();
+  c.restore();
+}
+
+function render(exp){
+  const c=ctx;c.setTransform(SC,0,0,SC,0,0);c.fillStyle=S.bg;c.fillRect(0,0,W,H);
+  c.fillStyle='rgba(0,0,0,.1)';c.beginPath();c.ellipse(308,800,110,9,0,0,Math.PI*2);c.fill();
+  body(c);
+  const g=geom();
+  if(g.shirt)pants(c);
+  c.save();c.clip(g.dress);fillFabric(c);c.restore();
+  if(S.shade)shade(c,g);
+  c.strokeStyle='rgba(0,0,0,.3)';c.lineWidth=1;c.stroke(g.outline);
+  if(g.shirt)shirtTrim(c,g);
+  arms(c);
+  if(g.sleeves){c.save();c.clip(g.sleeves);fillFabric(c);if(S.shade){c.fillStyle='rgba(0,0,0,.09)';c.fillRect(0,0,W,H)}c.restore();
+    c.strokeStyle='rgba(0,0,0,.25)';c.lineWidth=1;c.stroke(g.sleeves)}
+  if(S.photo)drawHead(c);
+  else{c.fillStyle=S.skin;c.beginPath();c.ellipse(300,94,42,54,0,0,Math.PI*2);c.fill()}
+  if(g.shirt)collar(c,g);
+  if(!exp&&pick&&S.photo){fullPhoto(c);return}
+  if(!exp&&tab==='photo')guides(c);
+}
+
+/* ---------- images ---------- */
+function loadImage(file){return new Promise((res,rej)=>{const u=URL.createObjectURL(file),im=new Image();
+  im.onload=()=>{URL.revokeObjectURL(u);res(im)};im.onerror=()=>{URL.revokeObjectURL(u);rej()};im.src=u})}
+function toCanvas(im,max){const k=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement('canvas');
+  c.width=Math.max(1,Math.round(im.width*k));c.height=Math.max(1,Math.round(im.height*k));c.getContext('2d').drawImage(im,0,0,c.width,c.height);return c}
+function addSwatch(src,pick){
+  const w=src.width,h=src.height,mir=document.createElement('canvas');mir.width=w*2;mir.height=h*2;
+  const m=mir.getContext('2d');
+  for(const[sx,sy]of[[1,1],[-1,1],[1,-1],[-1,-1]]){m.setTransform(sx,0,0,sy,sx<0?w*2:0,sy<0?h*2:0);m.drawImage(src,0,0)}
+  const sw={cv:src,mir},b=document.createElement('button'),t=document.createElement('canvas');
+  t.width=t.height=120;const k=Math.max(120/w,120/h);t.getContext('2d').drawImage(src,(120-w*k)/2,(120-h*k)/2,w*k,h*k);
+  b.className='sw';b.type='button';b.setAttribute('aria-label','Fabric '+(swatches.length+1));b.append(t);
+  b.onclick=()=>choose(sw);sw.btn=b;swatches.push(sw);$('#tray').append(b);
+  if(pick){choose(sw);b.scrollIntoView({block:'nearest',inline:'nearest'})}
+}
+function choose(sw){S.sw=sw;swatches.forEach(x=>x.btn.setAttribute('aria-pressed',x===sw));draw()}
+function starters(){
+  const mk=fn=>{const c=document.createElement('canvas');c.width=c.height=240;fn(c.getContext('2d'));return c};
+  addSwatch(mk(x=>{x.fillStyle='#21463D';x.fillRect(0,0,240,240);
+    const fl=[[30,40,'#F3B6C4'],[150,20,'#F6E3A1'],[95,110,'#F3B6C4'],[210,95,'#F4F1E4'],[40,180,'#F6E3A1'],[170,175,'#F3B6C4'],[110,215,'#F4F1E4'],[225,225,'#F6E3A1']];
+    for(const[fx,fy,col]of fl)for(const ox of[-240,0,240])for(const oy of[-240,0,240]){const X=fx+ox,Y=fy+oy;
+      x.fillStyle=col;for(let i=0;i<5;i++){const a=i*Math.PI*2/5+fx;x.beginPath();x.arc(X+Math.cos(a)*9,Y+Math.sin(a)*9,7,0,7);x.fill()}
+      x.fillStyle='#D98A2B';x.beginPath();x.arc(X,Y,4.5,0,7);x.fill();
+      x.fillStyle='#6FA98C';x.beginPath();x.ellipse(X+22,Y+16,8,3.5,.7,0,7);x.fill()}}),true);
+  addSwatch(mk(x=>{x.fillStyle='#F7F3E8';x.fillRect(0,0,240,240);x.fillStyle='rgba(38,84,140,.5)';
+    for(let i=0;i<240;i+=60){x.fillRect(i,0,30,240);x.fillRect(0,i,240,30)}}));
+  addSwatch(mk(x=>{x.fillStyle='#1E365C';x.fillRect(0,0,240,240);x.fillStyle='#F4EFE2';
+    for(let r=0;r<5;r++)for(let q=0;q<5;q++){x.beginPath();x.arc(q*60+(r%2?30:0),r*60,11,0,7);x.fill()}
+    for(let r=0;r<5;r++){x.beginPath();x.arc(240+(r%2?30:0)-(r%2?0:0),r*60,11,0,7);x.fill()}}));
+  addSwatch(mk(x=>{x.fillStyle='#F6F1E6';x.fillRect(0,0,240,240);x.fillStyle='#BF3F3A';for(let i=0;i<240;i+=40)x.fillRect(0,i,240,15)}));
+}
+
+/* ---------- controls ---------- */
+const vis=()=>$$('[data-for]').forEach(e=>e.hidden=e.dataset.for!==S.garment);
+const LEN=h=>h<500?'mini':h<640?'knee':h<715?'midi':'maxi';
+function sync(){
+  $$('[data-k]').forEach(i=>{const v=S[i.dataset.k];if(i.type==='checkbox')i.checked=v;else i.value=v});
+  $('#lenOut').textContent=LEN(S.hem);$('#photoClear').hidden=!S.photo;
+}
+$$('[data-seg]').forEach(d=>{const k=d.dataset.seg;
+  d.dataset.o.split(',').forEach(o=>{const[v,t]=o.split(':'),l=document.createElement('label'),i=document.createElement('input');
+    i.type='radio';i.name=k;i.value=v;i.checked=S[k]===v;i.onchange=()=>{S[k]=v;vis();draw()};l.append(i,t);d.append(l)})});
+$$('[data-k]').forEach(i=>i.addEventListener('input',()=>{const k=i.dataset.k;
+  S[k]=i.type==='checkbox'?i.checked:i.type==='range'?+i.value:i.value;
+  if(k==='hem')$('#lenOut').textContent=LEN(S.hem);draw()}));
+function setTab(t){tab=t;$$('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t));
+  $$('.pane').forEach(p=>p.classList.toggle('on',p.id==='p-'+t));cv.classList.toggle('drag',t!=='dress');
+  cv.style.cursor=t==='dress'?'default':'grab';say('');if(typeof pick!=='undefined'&&pick)setPick(null);draw()}
+$$('.tabs button').forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
+
+$('#photoFile').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
+  try{const im=toCanvas(await loadImage(f),1600);S.photo=im;S.pw=Math.max(260,260*im.width/im.height*1.2|0);S.pw=Math.min(S.pw,520);
+    S.px=300;S.py=96+(S.pw*im.height/im.width)*.08;S.prot=0;sync();render(false);
+    say('Photo added. Drag it until your face fills the pink oval.')}
+  catch{say('That file could not be opened as an image. Try a JPG or PNG.')}};
+$('#photoClear').onclick=()=>{S.photo=null;sync();draw();say('Photo removed.')};
+$('#fabFile').onchange=async e=>{const fs=[...e.target.files];e.target.value='';let bad=0;
+  for(const f of fs){try{addSwatch(toCanvas(await loadImage(f),1024),true)}catch{bad++}}
+  say(bad?bad+' file(s) could not be opened as images.':fs.length?'Fabric added.':'')};
+$('#fabReset').onclick=()=>{S.fx=S.fy=0;S.frot=0;S.fsize=100;sync();draw()};
+function matchSkin(quiet){
+  if(!S.photo){say('Choose a photo first, then match the skin tone.');return}
+  render(false);
+  const d=octx.getImageData(292*SC,150*SC,16*SC,14*SC).data;let r=0,g=0,b=0,n=0;
+  for(let i=0;i<d.length;i+=4)if(d[i+3]>240){r+=d[i];g+=d[i+1];b+=d[i+2];n++}
+  if(!n){if(!quiet)say('Move the photo so your neck sits inside the outline, then try again.');return}
+  S.skin='#'+[r,g,b].map(v=>Math.round(v/n).toString(16).padStart(2,'0')).join('');sync();draw();
+  if(!quiet)say('Skin tone matched from your neck.');
+}
+let pick=null;
+function setPick(k){pick=k;$$('[data-pick]').forEach(b=>{const on=b.dataset.pick===k;b.textContent=on?'Cancel':'Pick from photo';b.classList.toggle('main',on);b.classList.toggle('quiet',!on)});
+  cv.style.cursor=k?'crosshair':tab==='dress'?'default':'grab';draw()}
+$$('[data-pick]').forEach(b=>b.onclick=()=>{
+  if(pick===b.dataset.pick){setPick(null);say('');return}
+  if(!S.photo){say('Choose a photo first.');return}
+  setPick(b.dataset.pick);say(pick==='skin'?'Your whole photo is showing. Tap a patch of skin, such as your neck or cheek.':'Your whole photo is showing. Tap the wall or background behind you.')});
+function fullPhoto(c){const k=S.pw/S.photo.width;c.save();c.translate(S.px,S.py);c.rotate(S.prot*Math.PI/180);c.scale(k,k);c.drawImage(S.photo,-S.photo.width/2,-S.photo.height/2);c.restore()}
+function pickAt(e){
+  const r=cv.getBoundingClientRect(),x=(e.clientX-r.left)*W/r.width,y=(e.clientY-r.top)*H/r.height,o=octx;
+  o.setTransform(1,0,0,1,0,0);o.globalCompositeOperation='source-over';o.clearRect(0,0,off.width,off.height);o.setTransform(SC,0,0,SC,0,0);fullPhoto(o);
+  const d=o.getImageData(Math.max(0,Math.round(x*SC)-4),Math.max(0,Math.round(y*SC)-4),9,9).data;let R=0,G=0,B=0,n=0;
+  for(let i=0;i<d.length;i+=4)if(d[i+3]>240){R+=d[i];G+=d[i+1];B+=d[i+2];n++}
+  if(!n){say('That spot is outside your photo. Tap on the photo itself.');return}
+  const k=pick;S[k]='#'+[R,G,B].map(v=>Math.round(v/n).toString(16).padStart(2,'0')).join('');
+  setPick(null);sync();say(k==='skin'?'Skin tone set from your photo.':'Backdrop colour set from your photo.');
+}
+
+/* ---------- saved default ---------- */
+const DK='dressDefault',DF=['px','py','pw','prot','hw','hh','nw','feather','skin','bg'];
+$('#defSave').onclick=()=>{
+  if(!S.photo){say('Choose a photo first, then set it as your default.');return}
+  try{const d={img:toCanvas(S.photo,1100).toDataURL('image/jpeg',.88)};DF.forEach(k=>d[k]=S[k]);
+    localStorage.setItem(DK,JSON.stringify(d));$('#defClear').hidden=false;
+    say('Saved. This photo, its position and the skin tone will load automatically next time.')}
+  catch{say('Could not save the default. Browser storage may be full or switched off.')}};
+$('#defClear').onclick=()=>{try{localStorage.removeItem(DK)}catch{}$('#defClear').hidden=true;say('Default forgotten. Your current photo stays until you close the app.')};
+function loadDefault(){
+  let d=null;try{d=JSON.parse(localStorage.getItem(DK)||'null')}catch{}
+  if(!d||!d.img)return;
+  const im=new Image();im.onload=()=>{S.photo=toCanvas(im,1600);DF.forEach(k=>{if(d[k]!=null)S[k]=d[k]});
+    $('#defClear').hidden=false;sync();draw();say('Loaded your saved photo and skin tone.')};im.src=d.img;
+}
+
+/* ---------- pants colour ---------- */
+function pantsUI(){const cu=$('#pcCustom');cu.hidden=!S.custom;if(S.custom){cu.dataset.c=S.custom;cu.style.background=S.custom}
+  $$('.pc').forEach(b=>b.setAttribute('aria-pressed',b.dataset.c===S.pants))}
+$$('.pc').forEach(b=>b.onclick=()=>{S.pants=b.dataset.c;pantsUI();draw()});
+$('#pantsPick').addEventListener('input',e=>{S.custom=S.pants=e.target.value;try{localStorage.setItem('pantsCustom',S.custom)}catch{}pantsUI();draw()});
+try{const v=localStorage.getItem('pantsCustom');if(/^#[0-9a-f]{6}$/i.test(v||''))S.custom=v}catch{}
+pantsUI();
+
+/* ---------- drag / pinch ---------- */
+const pts=new Map();let pinch=0;
+const scale=()=>W/cv.getBoundingClientRect().width;
+const zoom=f=>{if(tab==='photo'&&S.photo)S.pw=Math.min(1400,Math.max(60,S.pw*f));
+  else if(tab==='fabric')S.fsize=Math.min(500,Math.max(8,S.fsize*f));else return;sync();draw()};
+cv.addEventListener('pointerdown',e=>{if(pick){pickAt(e);return}if(tab==='dress')return;cv.setPointerCapture(e.pointerId);pts.set(e.pointerId,[e.clientX,e.clientY]);pinch=0;cv.style.cursor='grabbing'});
+cv.addEventListener('pointermove',e=>{const p=pts.get(e.pointerId);if(!p)return;
+  const dx=(e.clientX-p[0])*scale(),dy=(e.clientY-p[1])*scale();p[0]=e.clientX;p[1]=e.clientY;
+  if(pts.size===1){if(tab==='photo'&&S.photo){S.px+=dx;S.py+=dy}else if(tab==='fabric'){S.fx+=dx;S.fy+=dy}draw()}
+  else if(pts.size===2){const[a,b]=[...pts.values()],d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(pinch&&d)zoom(d/pinch);pinch=d}});
+const up=e=>{pts.delete(e.pointerId);pinch=0;if(!pts.size&&tab!=='dress'&&!pick)cv.style.cursor='grab'};
+cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+cv.addEventListener('wheel',e=>{if(tab==='dress')return;e.preventDefault();zoom(e.deltaY<0?1.05:1/1.05)},{passive:false});
+
+/* ---------- save ---------- */
+$('#save').onclick=async()=>{
+  render(true);
+  const blob=await new Promise(r=>cv.toBlob(r,'image/png'));render(false);
+  if(!blob){say('The picture could not be made. Try a smaller photo.');return}
+  let dl=null;try{dl=window.claude&&await window.claude.use('downloads')}catch{}
+  if(dl){try{await dl.save({filename:'dress-mock-up.png',data:blob});say('Picture saved.');return}
+    catch(err){if(err&&err.code==='declined'){say('Save cancelled.');return}
+      if(err&&err.code==='rate_limited'){say('A save prompt is already open.');return}}}
+  $('#over img').src=URL.createObjectURL(blob);$('#over').classList.add('on');
+};
+$('#overClose').onclick=()=>$('#over').classList.remove('on');
+
+starters();sync();vis();loadDefault();setTab('photo');
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(draw);
+})();
+</script>
+</body>
+</html>
