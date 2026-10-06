@@ -48,6 +48,7 @@ h1{font:700 1.5rem/1.1 "Bricolage Grotesque","Instrument Sans",system-ui,sans-se
 .tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--pin)}
 .pane{display:none;flex-direction:column;gap:16px}
 .pane.on{display:flex}
+.sub{font:700 1.1rem/1.1 "Bricolage Grotesque",sans-serif;margin:4px 0 0;padding-top:16px;border-top:1px solid var(--line)}
 [hidden]{display:none!important}
 .hint{margin:0;color:var(--soft);font-size:.9rem;max-width:44ch}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;border-radius:8px;
@@ -88,7 +89,7 @@ input[type=color]{width:44px;height:36px;padding:0;border:1.5px solid var(--line
 <div class="app">
   <section class="stage">
     <header><div><h1>Garment Mockup</h1>
-      <p class="credit">Created by Emma · <a href="https://www.instagram.com/seamcerely/" target="_blank" rel="noopener">Instagram</a></p></div>
+      <p class="credit">Created by M · <a href="https://www.instagram.com/username/" target="_blank" rel="noopener">Instagram</a></p></div>
       <button class="btn main" id="save">Save picture</button></header>
     <canvas id="cv" width="1200" height="1800" aria-label="Preview of you wearing the dress"></canvas>
   </section>
@@ -129,22 +130,34 @@ input[type=color]{width:44px;height:36px;padding:0;border:1.5px solid var(--line
     </div>
 
     <div class="pane" id="p-dress">
-      <fieldset class="field"><legend>Garment</legend><div class="seg" data-seg="garment" data-o="dress:Dress,shirt:Collared shirt and pants"></div></fieldset>
+      <fieldset class="field"><legend>Garment</legend><div class="seg" data-seg="garment" data-o="dress:Dress,sep:Top and bottom"></div></fieldset>
       <fieldset class="field" data-for="dress"><legend>Silhouette</legend><div class="seg" data-seg="sil" data-o="sheath:Sheath,aline:A-line,flare:Fit and flare,shift:Shift"></div></fieldset>
       <fieldset class="field" data-for="dress"><legend>Neckline</legend><div class="seg" data-seg="neck" data-o="round:Round,v:V-neck,square:Square,boat:Boat"></div></fieldset>
+      <h2 class="sub" data-for="sep">Top</h2>
+      <fieldset class="field" data-for="sep"><legend>Neckline</legend><div class="seg" data-seg="tneck" data-o="v:V-neck,collar:Shirt collar,round:Round,boat:Boat"></div></fieldset>
       <fieldset class="field"><legend>Sleeves</legend><div class="seg" data-seg="sleeve" data-o="none:None,cap:Cap,short:Short,long:Long"></div></fieldset>
       <label class="field" data-for="dress"><span>Length: <output id="lenOut"></output></span><input type="range" data-k="hem" min="450" max="780" step="1"></label>
-      <fieldset class="field" data-for="shirt"><legend>Pants colour</legend>
+      <label class="field" data-for="sep"><span>Top hem length</span><input type="range" data-k="them" min="300" max="480" step="1"></label>
+      <fieldset class="field" data-for="sep"><legend>Top fabric</legend><div class="seg" data-seg="tfill" data-o="image:Fabric image,solid:Solid colour"></div></fieldset>
+      <label class="row" data-for="sep" data-if="tfill:solid"><input type="color" data-k="tcolor"><span>Top colour</span></label>
+      <h2 class="sub" data-for="sep">Bottom</h2>
+      <fieldset class="field" data-for="sep"><legend>Style</legend><div class="seg" data-seg="btype" data-o="skirt:Skirt,pants:Pants"></div></fieldset>
+      <fieldset class="field" data-for="sep"><legend>Width</legend><div class="seg" data-seg="bwidth" data-o="fit:Fitted,aline:A-line,flare:Flared"></div></fieldset>
+      <label class="field" data-for="sep"><span>Bottom hem length</span><input type="range" data-k="bhem" min="440" max="780" step="1"></label>
+      <fieldset class="field" data-for="sep"><legend>Bottom fabric</legend><div class="seg" data-seg="bfill" data-o="image:Fabric image,solid:Solid colour"></div></fieldset>
+      <fieldset class="field" data-for="sep" data-if="bfill:solid"><legend>Bottom colour</legend>
         <div class="row" id="pantsRow">
           <button type="button" class="sw pc" data-c="#16161a" style="background:#16161a" aria-label="Black"></button>
           <button type="button" class="sw pc" data-c="#f3eee0" style="background:#f3eee0" aria-label="Ivory"></button>
           <button type="button" class="sw pc" id="pcCustom" hidden aria-label="Your last custom colour"></button>
           <label class="btn quiet">Custom colour<input type="color" id="pantsPick" style="position:absolute;inset:0;width:100%;height:100%;opacity:0"></label>
         </div></fieldset>
+      <p class="hint" data-for="sep">Fabric images for the top and bottom are chosen in the Fabric tab.</p>
       <label class="check"><input type="checkbox" data-k="shade">Show folds and shading</label>
     </div>
 
     <div class="pane" id="p-fabric">
+      <fieldset class="field" data-for="sep"><legend>Apply fabric to</legend><div class="seg" data-seg="ft" data-o="top:Top,bottom:Bottom"></div></fieldset>
       <div class="row"><label class="btn main">Add fabric images<input type="file" id="fabFile" accept="image/*" multiple></label></div>
       <div class="tray" id="tray"></div>
       <p class="hint">Tap a swatch to try it. Drag on the sheet to slide the print around; pinch to resize it.</p>
@@ -158,7 +171,7 @@ input[type=color]{width:44px;height:36px;padding:0;border:1.5px solid var(--line
   </section>
 </div>
 
-<div id="over"><img alt="Your dress mock-up"><div>Press and hold the picture to save it.</div><button class="btn" style="color:#fff;border-color:#fff" id="overClose">Close</button></div>
+<div id="over"><img alt="Your garment mockup"><div>Press and hold the picture to save it.</div><button class="btn" style="color:#fff;border-color:#fff" id="overClose">Close</button></div>
 
 <script>
 (()=>{
@@ -167,7 +180,11 @@ const cv=$('#cv'),ctx=cv.getContext('2d');
 const off=document.createElement('canvas');off.width=W*SC;off.height=H*SC;const octx=off.getContext('2d',{willReadFrequently:true});
 const S={photo:null,px:300,py:110,pw:260,prot:0,hw:58,hh:70,nw:25,feather:8,skin:'#d9a98a',bg:'#ebe8e1',
   garment:'dress',pants:'#16161a',custom:null,sil:'aline',neck:'round',sleeve:'none',hem:535,shade:true,
-  layout:'repeat',mirror:false,fsize:100,frot:0,fx:0,fy:0,sw:null};
+  tneck:'collar',them:410,tfill:'image',tcolor:'#f3eee0',btype:'pants',bwidth:'aline',bhem:737,bfill:'solid',ft:'top'};
+const newF=()=>({layout:'repeat',mirror:false,fsize:100,frot:0,fx:0,fy:0,sw:null});
+const F={dress:newF(),top:newF(),bottom:newF()},FK=new Set(Object.keys(newF()));
+const cur=()=>S.garment==='dress'?'dress':S.ft;
+const get=k=>FK.has(k)?F[cur()][k]:S[k],set=(k,v)=>{if(FK.has(k))F[cur()][k]=v;else S[k]=v};
 let tab='photo',swatches=[],queued=false;
 const say=t=>{$('#msg').textContent=t||''};
 const draw=()=>{if(!queued){queued=true;requestAnimationFrame(()=>{queued=false;render(false)})}};
@@ -176,32 +193,33 @@ const draw=()=>{if(!queued){queued=true;requestAnimationFrame(()=>{queued=false;
 function halves(fn){for(const s of[1,-1])fn(d=>300+s*d,s)}
 function poly(p,a){p.moveTo(a[0],a[1]);for(let i=2;i<a.length;i+=2)p.lineTo(a[i],a[i+1]);p.closePath()}
 function geom(){
-  const shirt=S.garment==='shirt',hem=shirt?410:S.hem,sl=S.sleeve!=='none',nk=S.neck;
+  const top=S.garment!=='dress',key=top?'top':'dress',hem=top?S.them:S.hem,sl=S.sleeve!=='none',nk=top?S.tneck:S.neck,isCol=nk==='collar';
   const slope=d=>169+(d-24)*10/46;
   const nw=nk==='boat'?46:30,ny=slope(nw),spx=sl?66:56,spy=slope(spx);
   const cy={round:200,v:232,square:208,boat:182}[nk];
-  let waistW,hemW;const sag={sheath:4,shift:5,aline:8,flare:20}[S.sil];
+  let waistW,hemW;const sag={sheath:4,shift:5,aline:8,flare:14}[S.sil];
   if(S.sil==='sheath'){waistW=54;hemW=67-(hem-389)*.03}
   else if(S.sil==='shift'){waistW=66;hemW=72+(hem-400)*.05}
   else if(S.sil==='aline'){waistW=55;hemW=Math.min(68+(hem-389)*.13,125)}
-  else{waistW=53;hemW=Math.min(53+(hem-297)*.6,262)}
-  if(shirt){waistW=60;hemW=71}
+  else{waistW=53;hemW=Math.min(53+(hem-297)*.33,190)}
+  if(top){waistW=60;hemW=71}
+  const ss=t=>{t=Math.min(1,Math.max(0,t));return t*t*(3-2*t)};
+  const tw=y=>y<305?64-4*ss((y-236)/69):y<398?60+11*ss((y-305)/93):71+(y-398)*.04;
   const trace=(p,X,closed)=>{
     const arm=()=>{p.lineTo(X(spx),spy);if(sl)p.lineTo(X(64),236);else p.bezierCurveTo(X(52),195,X(52),220,X(64),236)};
-    if(shirt){
-      p.moveTo(X(closed?-1:0),190);p.lineTo(X(24),162);arm();
-      p.bezierCurveTo(X(66),270,X(60),285,X(60),305);p.bezierCurveTo(X(62),350,X(70),370,X(71),398);
-      p.bezierCurveTo(X(66),420,X(32),426,X(closed?-1:0),426);if(closed)p.closePath();return}
-    p.moveTo(X(closed?-1:0),cy);
-    if(nk==='round')p.bezierCurveTo(X(20),cy,X(nw),192,X(nw),ny);
+    if(isCol){p.moveTo(X(closed?-1:0),190);p.lineTo(X(24),162)}
+    else p.moveTo(X(closed?-1:0),cy);
+    if(isCol);else if(nk==='round')p.bezierCurveTo(X(20),cy,X(nw),192,X(nw),ny);
     else if(nk==='v')p.lineTo(X(nw),ny);
     else if(nk==='square'){p.lineTo(X(nw-3),cy);p.lineTo(X(nw),ny)}
     else p.quadraticCurveTo(X(26),cy+1,X(nw),ny);
     arm();
+    if(top){for(let y=246;y<hem;y+=10)p.lineTo(X(tw(y)),y);p.lineTo(X(tw(hem)),hem);
+      p.quadraticCurveTo(X(tw(hem)*.4),hem+5,X(closed?-1:0),hem+5);if(closed)p.closePath();return}
     if(S.sil==='sheath'){p.bezierCurveTo(X(64),262,X(54),278,X(54),297);p.bezierCurveTo(X(55),330,X(66),352,X(67),389);p.lineTo(X(hemW),hem)}
     else if(S.sil==='shift')p.bezierCurveTo(X(66),280,X(68),370,X(hemW),hem);
     else if(S.sil==='aline'){p.bezierCurveTo(X(64),262,X(55),278,X(55),297);p.bezierCurveTo(X(56),330,X(67),352,X(68),389);p.quadraticCurveTo(X(68+(hemW-68)*.45),(389+hem)/2,X(hemW),hem)}
-    else{p.bezierCurveTo(X(64),262,X(53),278,X(53),297);p.bezierCurveTo(X(100),317,X(hemW-12),hem-90,X(hemW),hem)}
+    else{p.bezierCurveTo(X(64),262,X(53),278,X(53),297);p.bezierCurveTo(X(78),322,X(hemW-10),hem-90,X(hemW),hem)}
     p.quadraticCurveTo(X(hemW*.4),hem+sag,X(closed?-1:0),hem+sag);
     if(closed)p.closePath();
   };
@@ -220,8 +238,8 @@ function geom(){
     else{p.lineTo(181,326);p.quadraticCurveTo(174,345,189,352);p.lineTo(219,389);p.lineTo(239,362);p.lineTo(216,314);p.lineTo(238,236)}
     p.closePath()}
   let col=null;
-  if(shirt){col=new Path2D();halves(X=>{col.moveTo(X(21),155);col.lineTo(X(1),192);col.lineTo(X(27),207);col.lineTo(X(38),170);col.quadraticCurveTo(X(31),158,X(21),155);col.closePath()})}
-  return{dress,outline,sleeves,waistW,hemW,hem,sag,shirt,collar:col};
+  if(isCol){col=new Path2D();halves(X=>{col.moveTo(X(21),155);col.lineTo(X(1),192);col.lineTo(X(27),207);col.lineTo(X(38),170);col.quadraticCurveTo(X(31),158,X(21),155);col.closePath()})}
+  return{dress,outline,sleeves,waistW,hemW,hem,sag,top,key,collar:col};
 }
 function maskPath(){
   const p=new Path2D(),cy=150-S.hh*.85;
@@ -277,43 +295,62 @@ function arms(c){
   p.quadraticCurveTo(259,380,246,374);p.lineTo(235,362);p.lineTo(212,318);p.bezierCurveTo(222,285,232,255,238,232);p.closePath();
   skinFill(c,p,184,258);
 }
-function pants(c){
-  const leg=(build,x0,x1,cr)=>{const p=new Path2D();build(p);
-    c.fillStyle=S.pants;c.fill(p);c.save();c.clip(p);
-    const g=c.createLinearGradient(x0,0,x1,0);
-    g.addColorStop(0,'rgba(0,0,0,.25)');g.addColorStop(.35,'rgba(255,255,255,.07)');g.addColorStop(.75,'rgba(0,0,0,.04)');g.addColorStop(1,'rgba(0,0,0,.3)');
-    c.fillStyle=g;c.fillRect(0,0,W,H);c.restore();
-    c.strokeStyle='rgba(255,255,255,.14)';c.lineWidth=1;c.beginPath();c.moveTo(cr[0],cr[1]);c.lineTo(cr[2],cr[3]);c.stroke();
-    c.strokeStyle='rgba(0,0,0,.35)';c.stroke(p)};
-  leg(p=>{p.moveTo(296,300);p.lineTo(354,300);p.bezierCurveTo(355,330,366,352,367,389);
-    p.bezierCurveTo(369,470,352,560,347,737);p.lineTo(290,737);p.lineTo(292,430);p.closePath()},290,369,[336,440,322,737]);
-  leg(p=>{p.moveTo(304,300);p.lineTo(246,300);p.bezierCurveTo(245,330,234,352,233,389);
-    p.bezierCurveTo(230,470,254,560,263,737);p.lineTo(321,737);p.bezierCurveTo(325,640,318,520,308,430);p.closePath()},231,323,[268,440,292,737]);
+function folds(c,n,ww,hw,ty,by){const fw=hw/n*1.1;
+  for(let i=0;i<n;i++){const t=(i+.5)/n*2-1,tx=300+t*ww*.8,bx=300+t*hw*.92;
+    for(const[dx,col]of[[0,'rgba(0,0,0,.17)'],[fw*.55,'rgba(255,255,255,.1)']]){
+      const x=bx+dx,gr=c.createLinearGradient(x-fw/2,0,x+fw/2,0);
+      gr.addColorStop(0,'rgba(0,0,0,0)');gr.addColorStop(.5,col);gr.addColorStop(1,'rgba(0,0,0,0)');
+      c.fillStyle=gr;c.beginPath();c.moveTo(tx,ty);c.lineTo(x-fw/2,by);c.lineTo(x+fw/2,by);c.closePath();c.fill()}}}
+function bottom(c){
+  const h=S.bhem,st=S.bwidth,ss=t=>{t=Math.min(1,Math.max(0,t));return t*t*(3-2*t)};
+  const fin=(p,x0,x1,extra)=>{c.save();c.clip(p);fillFabric(c,'bottom');
+    if(S.shade){const g=c.createLinearGradient(x0,0,x1,0);
+      g.addColorStop(0,'rgba(0,0,0,.28)');g.addColorStop(.3,'rgba(255,255,255,.06)');g.addColorStop(.75,'rgba(0,0,0,.04)');g.addColorStop(1,'rgba(0,0,0,.32)');
+      c.fillStyle=g;c.fillRect(0,0,W,H);if(extra)extra()}
+    c.restore();c.strokeStyle='rgba(0,0,0,.35)';c.lineWidth=1;c.stroke(p)};
+  if(S.btype==='skirt'){
+    const hw=st==='fit'?67-(h-389)*.03:st==='aline'?Math.min(68+(h-389)*.13,125):Math.min(54+(h-297)*.42,215),sag=st==='flare'?14:6,p=new Path2D();
+    halves(X=>{p.moveTo(X(-1),297);p.lineTo(X(54),297);
+      if(st==='flare')p.bezierCurveTo(X(86),320,X(hw-12),h-90,X(hw),h);
+      else{p.bezierCurveTo(X(55),330,X(67),352,X(68),389);p.quadraticCurveTo(X(68+(hw-68)*.45),(389+h)/2,X(hw),h)}
+      p.quadraticCurveTo(X(hw*.4),h+sag,X(-1),h+sag);p.closePath()});
+    const m=Math.max(hw,68);fin(p,300-m,300+m,st==='fit'?null:()=>folds(c,st==='flare'?6:3,54,hw,303,h+40));
+    return}
+  const w3={fit:[37,23,14],aline:[38,28,26],flare:[40,43,54]}[st];
+  const hwf=y=>y<620?w3[0]+(w3[1]-w3[0])*ss((y-430)/190):w3[1]+(w3[2]-w3[1])*ss((y-620)/107);
+  const leg=(c0,c1,c2,s)=>{
+    const cx=y=>y<620?c0+(c1-c0)*(y-430)/190:c1+(c2-c1)*Math.min(1,(y-620)/107);
+    const p=new Path2D(),ys=[];for(let y=430;y<h;y+=12)ys.push(y);ys.push(h);
+    p.moveTo(300-s*4,297);p.lineTo(300+s*54,297);p.bezierCurveTo(300+s*55,330,300+s*66,352,300+s*67,389);
+    ys.forEach(y=>p.lineTo(cx(y)+s*hwf(y),y));ys.slice().reverse().forEach(y=>p.lineTo(cx(y)-s*hwf(y),y));p.closePath();
+    const m=(430+h)/2;fin(p,cx(m)-hwf(m)-4,cx(m)+hwf(m)+4,()=>{c.strokeStyle='rgba(255,255,255,.14)';c.lineWidth=1;c.beginPath();c.moveTo(cx(440),440);c.lineTo(cx(h),h);c.stroke()})};
+  leg(331,317,315,1);leg(270,292,296,-1);
 }
 function shirtTrim(c,g){
   c.save();c.clip(g.dress);c.strokeStyle='rgba(0,0,0,.28)';c.lineWidth=1;
-  for(const x of[293,307]){c.beginPath();c.moveTo(x,184);c.lineTo(x,440);c.stroke()}
-  for(let y=210;y<418;y+=36){c.fillStyle='rgba(255,255,255,.9)';c.beginPath();c.arc(300,y,3,0,7);c.fill();c.stroke()}
+  for(const x of[293,307]){c.beginPath();c.moveTo(x,184);c.lineTo(x,520);c.stroke()}
+  for(let y=210;y<g.hem-6;y+=36){c.fillStyle='rgba(255,255,255,.9)';c.beginPath();c.arc(300,y,3,0,7);c.fill();c.stroke()}
   c.restore();
 }
 function collar(c,g){
-  c.save();c.clip(g.collar);fillFabric(c);c.fillStyle='rgba(255,255,255,.1)';c.fillRect(0,0,W,H);c.restore();
+  c.save();c.clip(g.collar);fillFabric(c,g.key);c.fillStyle='rgba(255,255,255,.1)';c.fillRect(0,0,W,H);c.restore();
   c.strokeStyle='rgba(0,0,0,.4)';c.lineWidth=1.2;c.lineJoin='round';c.stroke(g.collar);
 }
 
 /* ---------- fabric ---------- */
-function fillFabric(c){
-  const sw=S.sw;c.save();
-  if(!sw){c.fillStyle='#bbb';c.fillRect(0,0,W,H);c.restore();return}
-  const pct=S.fsize/100,rot=S.frot;
-  if(S.layout==='repeat'){
-    const k=150*pct/sw.cv.width,p=c.createPattern(S.mirror?sw.mir:sw.cv,'repeat');
-    p.setTransform(new DOMMatrix().translate(300+S.fx,400+S.fy).rotate(rot).scale(k));
+function fillFabric(c,key){
+  const f=F[key],sw=f.sw;c.save();
+  const solid=key==='top'?S.tfill==='solid'&&S.tcolor:key==='bottom'?S.bfill==='solid'&&S.pants:null;
+  if(solid||!sw){c.fillStyle=solid||'#bbb';c.fillRect(0,0,W,H);c.restore();return}
+  const pct=f.fsize/100,rot=f.frot;
+  if(f.layout==='repeat'){
+    const k=150*pct/sw.cv.width,p=c.createPattern(f.mirror?sw.mir:sw.cv,'repeat');
+    p.setTransform(new DOMMatrix().translate(300+f.fx,400+f.fy).rotate(rot).scale(k));
     c.fillStyle=p;c.fillRect(0,0,W,H);
   }else{
     c.fillStyle='#d8d8d8';c.fillRect(0,0,W,H);
-    const bot=S.garment==='shirt'?426:S.hem,k=Math.max(460/sw.cv.width,(bot-160)/sw.cv.height)*pct;
-    c.translate(300+S.fx,(180+bot)/2+S.fy);c.rotate(rot*Math.PI/180);c.scale(k,k);
+    const t=key==='bottom'?297:160,bot=key==='top'?S.them:key==='bottom'?S.bhem:S.hem,k=Math.max(460/sw.cv.width,(bot-t)/sw.cv.height)*pct;
+    c.translate(300+f.fx,(t+bot)/2+f.fy);c.rotate(rot*Math.PI/180);c.scale(k,k);
     c.drawImage(sw.cv,-sw.cv.width/2,-sw.cv.height/2);
   }
   c.restore();
@@ -323,17 +360,12 @@ function shade(c,g){
   const band=(y0,y1,hw)=>{const gr=c.createLinearGradient(300-hw,0,300+hw,0);
     gr.addColorStop(0,'rgba(0,0,0,.36)');gr.addColorStop(.2,'rgba(0,0,0,.08)');gr.addColorStop(.45,'rgba(255,255,255,.06)');
     gr.addColorStop(.8,'rgba(0,0,0,.1)');gr.addColorStop(1,'rgba(0,0,0,.4)');c.fillStyle=gr;c.fillRect(0,y0,W,y1-y0)};
-  const flared=!g.shirt&&(S.sil==='aline'||S.sil==='flare');
+  const flared=!g.top&&(S.sil==='aline'||S.sil==='flare');
   band(0,297,66);band(297,H,flared?g.hemW:Math.max(66,g.hemW));
   halves(X=>{let r=c.createRadialGradient(X(28),226,2,X(28),226,26);r.addColorStop(0,'rgba(255,255,255,.13)');r.addColorStop(1,'rgba(255,255,255,0)');c.fillStyle=r;c.fillRect(X(28)-28,196,56,62);
     r=c.createRadialGradient(X(28),256,2,X(28),256,22);r.addColorStop(0,'rgba(0,0,0,.14)');r.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=r;c.fillRect(X(28)-24,232,48,48)});
   if(flared){
-    const n=S.sil==='flare'?7:3,hw=g.hemW,fw=hw/n*1.1,by=g.hem+40;
-    for(let i=0;i<n;i++){const t=(i+.5)/n*2-1,tx=300+t*g.waistW*.8,bx=300+t*hw*.92;
-      for(const[dx,col]of[[0,'rgba(0,0,0,.17)'],[fw*.55,'rgba(255,255,255,.1)']]){
-        const x=bx+dx,gr=c.createLinearGradient(x-fw/2,0,x+fw/2,0);
-        gr.addColorStop(0,'rgba(0,0,0,0)');gr.addColorStop(.5,col);gr.addColorStop(1,'rgba(0,0,0,0)');
-        c.fillStyle=gr;c.beginPath();c.moveTo(tx,303);c.lineTo(x-fw/2,by);c.lineTo(x+fw/2,by);c.closePath();c.fill()}}
+    folds(c,S.sil==='flare'?5:3,g.waistW,g.hemW,303,g.hem+40);
     if(S.sil==='flare'&&flared){c.strokeStyle='rgba(0,0,0,.28)';c.lineWidth=1.5;c.beginPath();c.moveTo(300-g.waistW,297);c.quadraticCurveTo(300,302,300+g.waistW,297);c.stroke()}
   }
   c.restore();
@@ -364,17 +396,17 @@ function render(exp){
   c.fillStyle='rgba(0,0,0,.1)';c.beginPath();c.ellipse(308,800,110,9,0,0,Math.PI*2);c.fill();
   body(c);
   const g=geom();
-  if(g.shirt)pants(c);
-  c.save();c.clip(g.dress);fillFabric(c);c.restore();
+  if(g.top)bottom(c);
+  c.save();c.clip(g.dress);fillFabric(c,g.key);c.restore();
   if(S.shade)shade(c,g);
   c.strokeStyle='rgba(0,0,0,.3)';c.lineWidth=1;c.stroke(g.outline);
-  if(g.shirt)shirtTrim(c,g);
+  if(g.collar)shirtTrim(c,g);
   arms(c);
-  if(g.sleeves){c.save();c.clip(g.sleeves);fillFabric(c);if(S.shade){c.fillStyle='rgba(0,0,0,.09)';c.fillRect(0,0,W,H)}c.restore();
+  if(g.sleeves){c.save();c.clip(g.sleeves);fillFabric(c,g.key);if(S.shade){c.fillStyle='rgba(0,0,0,.09)';c.fillRect(0,0,W,H)}c.restore();
     c.strokeStyle='rgba(0,0,0,.25)';c.lineWidth=1;c.stroke(g.sleeves)}
   if(S.photo)drawHead(c);
   else{c.fillStyle=S.skin;c.beginPath();c.ellipse(300,94,42,54,0,0,Math.PI*2);c.fill()}
-  if(g.shirt)collar(c,g);
+  if(g.collar)collar(c,g);
   if(!exp&&pick&&S.photo){fullPhoto(c);return}
   if(!exp&&tab==='photo')guides(c);
 }
@@ -394,7 +426,7 @@ function addSwatch(src,pick){
   b.onclick=()=>choose(sw);sw.btn=b;swatches.push(sw);$('#tray').append(b);
   if(pick){choose(sw);b.scrollIntoView({block:'nearest',inline:'nearest'})}
 }
-function choose(sw){S.sw=sw;swatches.forEach(x=>x.btn.setAttribute('aria-pressed',x===sw));draw()}
+function choose(sw){const k=cur();F[k].sw=sw;if(k==='top')S.tfill='image';if(k==='bottom')S.bfill='image';if(typeof vis==='function'){vis();sync()}draw()}
 function starters(){
   const mk=fn=>{const c=document.createElement('canvas');c.width=c.height=240;fn(c.getContext('2d'));return c};
   addSwatch(mk(x=>{x.fillStyle='#21463D';x.fillRect(0,0,240,240);
@@ -412,17 +444,22 @@ function starters(){
 }
 
 /* ---------- controls ---------- */
-const vis=()=>$$('[data-for]').forEach(e=>e.hidden=e.dataset.for!==S.garment);
+function vis(){$$('[data-for],[data-if]').forEach(e=>{let h=!!e.dataset.for&&e.dataset.for!==S.garment;
+    if(e.dataset.if){const[k,v]=e.dataset.if.split(':');if(S[k]!==v)h=true}e.hidden=h});
+  const n=S.btype==='skirt'?['Fitted','A-line','Flared']:['Skinny','Slim','Wide leg'];
+  $$('input[name=bwidth]').forEach((i,j)=>i.parentNode.lastChild.textContent=n[j])}
 const LEN=h=>h<500?'mini':h<640?'knee':h<715?'midi':'maxi';
 function sync(){
-  $$('[data-k]').forEach(i=>{const v=S[i.dataset.k];if(i.type==='checkbox')i.checked=v;else i.value=v});
+  $$('[data-k]').forEach(i=>{const v=get(i.dataset.k);if(i.type==='checkbox')i.checked=v;else i.value=v});
+  $$('.seg input').forEach(i=>i.checked=get(i.name)===i.value);
+  swatches.forEach(x=>x.btn.setAttribute('aria-pressed',x===F[cur()].sw));
   $('#lenOut').textContent=LEN(S.hem);$('#photoClear').hidden=!S.photo;
 }
 $$('[data-seg]').forEach(d=>{const k=d.dataset.seg;
   d.dataset.o.split(',').forEach(o=>{const[v,t]=o.split(':'),l=document.createElement('label'),i=document.createElement('input');
-    i.type='radio';i.name=k;i.value=v;i.checked=S[k]===v;i.onchange=()=>{S[k]=v;vis();draw()};l.append(i,t);d.append(l)})});
+    i.type='radio';i.name=k;i.value=v;i.checked=get(k)===v;i.onchange=()=>{set(k,v);if(k==='btype')S.bhem=v==='skirt'?560:737;vis();sync();draw()};l.append(i,t);d.append(l)})});
 $$('[data-k]').forEach(i=>i.addEventListener('input',()=>{const k=i.dataset.k;
-  S[k]=i.type==='checkbox'?i.checked:i.type==='range'?+i.value:i.value;
+  set(k,i.type==='checkbox'?i.checked:i.type==='range'?+i.value:i.value);
   if(k==='hem')$('#lenOut').textContent=LEN(S.hem);draw()}));
 function setTab(t){tab=t;$$('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t));
   $$('.pane').forEach(p=>p.classList.toggle('on',p.id==='p-'+t));cv.classList.toggle('drag',t!=='dress');
@@ -438,7 +475,7 @@ $('#photoClear').onclick=()=>{S.photo=null;sync();draw();say('Photo removed.')};
 $('#fabFile').onchange=async e=>{const fs=[...e.target.files];e.target.value='';let bad=0;
   for(const f of fs){try{addSwatch(toCanvas(await loadImage(f),1024),true)}catch{bad++}}
   say(bad?bad+' file(s) could not be opened as images.':fs.length?'Fabric added.':'')};
-$('#fabReset').onclick=()=>{S.fx=S.fy=0;S.frot=0;S.fsize=100;sync();draw()};
+$('#fabReset').onclick=()=>{const f=F[cur()];f.fx=f.fy=0;f.frot=0;f.fsize=100;sync();draw()};
 function matchSkin(quiet){
   if(!S.photo){say('Choose a photo first, then match the skin tone.');return}
   render(false);
@@ -494,11 +531,11 @@ pantsUI();
 const pts=new Map();let pinch=0;
 const scale=()=>W/cv.getBoundingClientRect().width;
 const zoom=f=>{if(tab==='photo'&&S.photo)S.pw=Math.min(1400,Math.max(60,S.pw*f));
-  else if(tab==='fabric')S.fsize=Math.min(500,Math.max(8,S.fsize*f));else return;sync();draw()};
+  else if(tab==='fabric'){const q=F[cur()];q.fsize=Math.min(500,Math.max(8,q.fsize*f))}else return;sync();draw()};
 cv.addEventListener('pointerdown',e=>{if(pick){pickAt(e);return}if(tab==='dress')return;cv.setPointerCapture(e.pointerId);pts.set(e.pointerId,[e.clientX,e.clientY]);pinch=0;cv.style.cursor='grabbing'});
 cv.addEventListener('pointermove',e=>{const p=pts.get(e.pointerId);if(!p)return;
   const dx=(e.clientX-p[0])*scale(),dy=(e.clientY-p[1])*scale();p[0]=e.clientX;p[1]=e.clientY;
-  if(pts.size===1){if(tab==='photo'&&S.photo){S.px+=dx;S.py+=dy}else if(tab==='fabric'){S.fx+=dx;S.fy+=dy}draw()}
+  if(pts.size===1){if(tab==='photo'&&S.photo){S.px+=dx;S.py+=dy}else if(tab==='fabric'){F[cur()].fx+=dx;F[cur()].fy+=dy}draw()}
   else if(pts.size===2){const[a,b]=[...pts.values()],d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(pinch&&d)zoom(d/pinch);pinch=d}});
 const up=e=>{pts.delete(e.pointerId);pinch=0;if(!pts.size&&tab!=='dress'&&!pick)cv.style.cursor='grab'};
 cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
@@ -510,14 +547,14 @@ $('#save').onclick=async()=>{
   const blob=await new Promise(r=>cv.toBlob(r,'image/png'));render(false);
   if(!blob){say('The picture could not be made. Try a smaller photo.');return}
   let dl=null;try{dl=window.claude&&await window.claude.use('downloads')}catch{}
-  if(dl){try{await dl.save({filename:'dress-mock-up.png',data:blob});say('Picture saved.');return}
+  if(dl){try{await dl.save({filename:'Mockup.png',data:blob});say('Picture saved.');return}
     catch(err){if(err&&err.code==='declined'){say('Save cancelled.');return}
       if(err&&err.code==='rate_limited'){say('A save prompt is already open.');return}}}
   $('#over img').src=URL.createObjectURL(blob);$('#over').classList.add('on');
 };
 $('#overClose').onclick=()=>$('#over').classList.remove('on');
 
-starters();sync();vis();loadDefault();setTab('photo');
+starters();F.top.sw=swatches[0];F.bottom.sw=swatches[1];sync();vis();loadDefault();setTab('photo');
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(draw);
 })();
 </script>
